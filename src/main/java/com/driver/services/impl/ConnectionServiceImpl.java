@@ -39,12 +39,12 @@ public class ConnectionServiceImpl implements ConnectionService {
             int smallestId = Integer.MAX_VALUE;
             Country country = null;
             ServiceProvider serviceProvider = null;
-            countryName = countryName.toUpperCase();
+
             for (ServiceProvider currServiceProvider : serviceProviders) {
                 List<Country> countries = currServiceProvider.getCountryList();
                 for (Country currCountry : countries) {
                     String currCountryName = currCountry.getCountryName().toString();
-                    if (currCountryName.equals(countryName) && smallestId > currServiceProvider.getId()) {
+                    if (currCountryName.equalsIgnoreCase(countryName) && smallestId > currServiceProvider.getId()) {
                         serviceProvider = currServiceProvider;
                         country = currCountry;
                         smallestId = currServiceProvider.getId();
@@ -57,13 +57,16 @@ public class ConnectionServiceImpl implements ConnectionService {
                 connection.setUser(user);
                 connection.setServiceProvider(serviceProvider);
 
-                String maskedId = country.getCode() + "." + serviceProvider.getId() + "." + user.getId();
+                String countryCode = country.getCode();
+                String maskedId = countryCode + "." + serviceProvider.getId() + "." + userId;
                 user.setMaskedIp(maskedId);
                 user.setConnected(true);
                 user.getConnectionList().add(connection);
 
                 serviceProvider.getConnectionList().add(connection);
-                serviceProviderRepository2.save(serviceProvider); // save both user and serviceProvider
+
+                userRepository2.save(user);
+                serviceProviderRepository2.save(serviceProvider);
             }
         }
         return user;
