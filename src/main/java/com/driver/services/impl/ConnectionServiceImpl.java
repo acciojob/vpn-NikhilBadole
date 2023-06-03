@@ -22,6 +22,8 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public User connect(int userId, String countryName) throws Exception{
         User user = userRepository2.findById(userId).get();
+        countryName = countryName.toUpperCase();
+
         if(user.getMaskedIp() != null){
             throw new Exception("Already connected");
         }
